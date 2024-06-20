@@ -19,9 +19,11 @@ import com.service.ProductService;
 import com.service.ProductServiceImpl;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
-
+import java.awt.print.PrinterException;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 //import javax.swing.JSpinner;
 
 
@@ -34,6 +36,7 @@ public class ProductListForm extends JFrame {
 	private JTextField companyTxt;
 	private JTextField priceTxt;
 	private int pid = 0;
+	private JTextField searchTxt;
 
 	/**
 	 * Launch the application.
@@ -65,7 +68,7 @@ public class ProductListForm extends JFrame {
 		contentPane.setLayout(null);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(230, 66, 434, 324);
+		scrollPane.setBounds(230, 107, 434, 283);
 		contentPane.add(scrollPane);
 		
 		table = new JTable();
@@ -80,7 +83,7 @@ public class ProductListForm extends JFrame {
 		
 		JLabel lblNewLabel = new JLabel("Product List");
 		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 18));
-		lblNewLabel.setBounds(246, 11, 114, 44);
+		lblNewLabel.setBounds(286, 11, 114, 44);
 		contentPane.add(lblNewLabel);
 		
 		JButton btnNewButton = new JButton("Delete");
@@ -164,12 +167,14 @@ public class ProductListForm extends JFrame {
 				
 				Product pd = new Product();
 				pd.setId(pid);
-				pd.setName(nameTxt.getName());
-				pd.setCompany(companyTxt.getName());
+				pd.setName(nameTxt.getText());
+				pd.setCompany(companyTxt.getText());
 				pd.setPrice(Integer.parseInt(priceTxt.getText()));
 				
 				ProductService service = new ProductServiceImpl();
 				service.updateProduct(pd);
+				
+				displayData();
 				JOptionPane.showMessageDialog(null, "Update Success");				
 				
 			}
@@ -180,11 +185,13 @@ public class ProductListForm extends JFrame {
 		JButton btnNewButton_3 = new JButton("print");
 		btnNewButton_3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				try {
-					table.print();
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
+				
+					try {
+						table.print();
+					} catch (PrinterException e1) {
+						e1.printStackTrace();
+					}
+				
 			}
 		});
 		btnNewButton_3.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -198,18 +205,49 @@ public class ProductListForm extends JFrame {
 			}
 		});
 		btnNewButton_4.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnNewButton_4.setBounds(21, 15, 141, 40);
+		btnNewButton_4.setBounds(21, 15, 162, 40);
 		contentPane.add(btnNewButton_4);
 		
 		JButton btnNewButton_5 = new JButton("Refresh");
 		btnNewButton_5.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
+				displayData();
 			}
 		});
 		btnNewButton_5.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnNewButton_5.setBounds(525, 11, 106, 32);
 		contentPane.add(btnNewButton_5);
+		
+		JLabel lblNewLabel_1_1 = new JLabel("Search");
+		lblNewLabel_1_1.setFont(new Font("Tahoma", Font.BOLD, 13));
+		lblNewLabel_1_1.setBounds(230, 68, 86, 28);
+		contentPane.add(lblNewLabel_1_1);
+		
+		searchTxt = new JTextField();
+		searchTxt.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				
+				String sdata = searchTxt.getText().trim();
+				
+				ProductService service = new ProductServiceImpl();
+				List<Product> plist = service.searchProduct(sdata);
+				
+				DefaultTableModel tmodel = (DefaultTableModel) table.getModel();
+				
+				tmodel.setRowCount(0); //table reset
+				
+				for(Product p : plist) {
+					
+					
+					tmodel.addRow(new Object[] {p.getId(), p.getName(), p.getCompany(), p.getPrice()});
+				}
+			}
+		});
+		searchTxt.setColumns(10);
+		searchTxt.setBounds(286, 76, 184, 20);
+		contentPane.add(searchTxt);
 		
 		displayData(); // load product list and display in JTable
 	}

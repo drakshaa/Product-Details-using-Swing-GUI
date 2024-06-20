@@ -87,7 +87,7 @@ public class ProductServiceImpl implements ProductService{
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/productdb","draksha","cdraksha@nep");
-			String sql = "update product set name='"+p.getName()+"' , company = '"+p.getCompany()+"' , price = '"+p.getPrice()+"' ";
+			String sql = "update product set name='"+p.getName()+"' , company = '"+p.getCompany()+"' , price = '"+p.getPrice()+"' where id = '"+p.getId()+"'";
 			Statement stm = con.createStatement();
 			stm.execute(sql);
 			
@@ -96,5 +96,37 @@ public class ProductServiceImpl implements ProductService{
 		}
 		
 		
+	}
+
+	@Override
+	public List<Product> searchProduct(String sdata) {
+		
+		List<Product> plist = new ArrayList<>();
+		
+		try {
+			
+		Class.forName("com.mysql.cj.jdbc.Driver");
+		Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/productdb","draksha","cdraksha@nep");
+		String sql = "select * from Product where name like '%"+sdata+"%' OR company like '%"+sdata+"%' ";
+		Statement stm = con.createStatement();
+		ResultSet rs = stm.executeQuery(sql);
+		
+		while (rs.next()) {
+			
+			//row mapping object
+			Product pd = new Product();
+			
+			pd.setId(rs.getInt("id"));
+			pd.setName(rs.getString("name"));
+			pd.setCompany(rs.getString("company"));
+			pd.setPrice(rs.getInt("price"));
+			
+			plist.add(pd);
+		}
+		}  catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return plist;
 	}
 }

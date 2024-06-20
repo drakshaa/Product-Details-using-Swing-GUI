@@ -12,4 +12,6 @@ public interface ProductService {
 	
 	void updateProduct(Product p);
 	
+	List<Product> searchProduct(String sdata);
+	
 }
