@@ -82,7 +82,7 @@ public class ProductLoginForm extends JFrame {
 				String un = usernameTxt.getText();
 				String pw = passwordTxt.getText();
 				
-				if (un.equals("Ram") && pw.equals("123")) {
+				if (un.equals("Ram") && pw.equals("111")) {
 					
 					new ProductListForm().setVisible(true);
 					dispose();
